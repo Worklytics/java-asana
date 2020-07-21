@@ -12,19 +12,19 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * API Key Instructions:
+ * PAT Instructions:
  * <p>
- * 1. set your ASANA_API_KEY environment variable to the API key found in Asana Account Settings
+ * 1. set your ASANA_ACCESS_TOKEN environment variable to a personal access token
  */
 public class ExampleCreateTaskAndUpload {
 
     public static void main(String[] args) throws Exception {
-        if (System.getenv("ASANA_API_KEY") == null) {
-            throw new Error("Please set the ASANA_API_KEY environment variable.");
+        if (System.getenv("ASANA_ACCESS_TOKEN") == null) {
+            throw new Error("Please set the ASANA_ACCESS_TOKEN environment variable.");
         }
 
-        // create a client with your Asana API key
-        Client client = Client.basicAuth(System.getenv("ASANA_API_KEY"));
+        // create a client with your Asana PAT
+        Client client = Client.accessToken(System.getenv("ASANA_ACCESS_TOKEN"));
 
         // find your "Personal Projects" project
         Workspace personalProjects = null;
@@ -36,7 +36,7 @@ public class ExampleCreateTaskAndUpload {
         }
 
         // create a "demo project" if it doesn't exist
-        List<Project> projects = client.projects.findByWorkspace(personalProjects.id).execute();
+        List<Project> projects = client.projects.findByWorkspace(personalProjects.gid).execute();
         Project demoProject = null;
         for (Project project : projects) {
             if (project.name.equals("demo project")) {
@@ -45,25 +45,25 @@ public class ExampleCreateTaskAndUpload {
             }
         }
         if (demoProject == null) {
-            demoProject = client.projects.createInWorkspace(personalProjects.id)
+            demoProject = client.projects.createInWorkspace(personalProjects.gid)
                     .data("name", "demo project")
                     .execute();
         }
 
         // create a task in the project
-        Task demoTask = client.tasks.createInWorkspace(personalProjects.id)
+        Task demoTask = client.tasks.createInWorkspace(personalProjects.gid)
                 .data("name", "demo task created at " + new Date())
-                .data("projects", Arrays.asList(demoProject.id))
+                .data("projects", Arrays.asList(demoProject.gid))
                 .execute();
-        System.out.println("Task " + demoTask.id + " created.");
+        System.out.println("Task " + demoTask.gid + " created.");
 
         // add an attachment to the task
         Attachment demoAttachment = client.attachments.createOnTask(
-                demoTask.id,
+                demoTask.gid,
                 new ByteArrayInputStream("hello world".getBytes()),
                 "upload.txt",
                 "text/plain"
         ).execute();
-        System.out.println("Attachment " + demoAttachment.id + " created.");
+        System.out.println("Attachment " + demoAttachment.gid + " created.");
     }
 }

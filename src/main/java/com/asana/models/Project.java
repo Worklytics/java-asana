@@ -5,11 +5,25 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collection;
 import com.google.api.client.util.DateTime;
 
-public class Project {
-    public String id;
+public class Project extends Resource {
     public String name;
+    public User owner;
+    public String layout;
+
+    @SerializedName("current_status")
+    public ProjectStatus currentStatus;
+
+    @SerializedName("due_date")
+    public DateTime dueDate;
+    @SerializedName("due_on")
+    public DateTime dueOn;
+    @SerializedName("start_on")
+    public DateTime startOn;
 
     public String notes;
+    @SerializedName("html_notes")
+    public String htmlNotes;
+
     public String color;
     @SerializedName("archived")
     public boolean isArchived;
@@ -22,6 +36,9 @@ public class Project {
     public Team team;
     public Workspace workspace;
 
+    @SerializedName("custom_fields")
+    public Collection<CustomField> customFields;
+
     @SerializedName("custom_field_settings")
     public Collection<CustomFieldSetting> customFieldSettings;
 
@@ -29,15 +46,4 @@ public class Project {
     public DateTime createdAt;
     @SerializedName("modified_at")
     public DateTime modifiedAt;
-
-    public User owner;
-
-    public Project() {
-        //no-arg constructor
-    }
-
-    // constructor with id arg provided for convenience
-    public Project(String id) {
-        this.id = id;
-    }
 }

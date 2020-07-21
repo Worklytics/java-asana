@@ -8,19 +8,19 @@ import com.asana.models.Workspace;
 import java.util.List;
 
 /**
- * API Key Instructions:
+ * PAT Instructions:
  * <p>
- * 1. set your ASANA_API_KEY environment variable to the API key found in Asana Account Settings
+ * 1. set your ASANA_ACCESS_TOKEN environment variable to a personal access token
  */
 public class ExampleCreateProjectAndStreamEvents {
 
     public static void main(String[] args) throws Exception {
-        if (System.getenv("ASANA_API_KEY") == null) {
-            throw new Error("Please set the ASANA_API_KEY environment variable.");
+        if (System.getenv("ASANA_ACCESS_TOKEN") == null) {
+            throw new Error("Please set the ASANA_ACCESS_TOKEN environment variable.");
         }
 
-        // create a client with your Asana API key
-        Client client = Client.basicAuth(System.getenv("ASANA_API_KEY"));
+        // create a client with your Asana PAT
+        Client client = Client.accessToken(System.getenv("ASANA_ACCESS_TOKEN"));
 
         // find your "Personal Projects" project
         Workspace personalProjects = null;
@@ -32,7 +32,7 @@ public class ExampleCreateProjectAndStreamEvents {
         }
 
         // create a "demo project" if it doesn't exist
-        List<Project> projects = client.projects.findByWorkspace(personalProjects.id).execute();
+        List<Project> projects = client.projects.findByWorkspace(personalProjects.gid).execute();
         Project demoProject = null;
         for (Project project : projects) {
             if (project.name.equals("demo project")) {
@@ -41,7 +41,7 @@ public class ExampleCreateProjectAndStreamEvents {
             }
         }
         if (demoProject == null) {
-            demoProject = client.projects.createInWorkspace(personalProjects.id)
+            demoProject = client.projects.createInWorkspace(personalProjects.gid)
                     .data("name", "demo project")
                     .execute();
         }
@@ -49,7 +49,7 @@ public class ExampleCreateProjectAndStreamEvents {
         // start streaming modifications to the demo project.
         // make some changes in Asana to see this working
         System.out.println("== Streaming events for 'demo project' in 'Personal Projects' workspace:");
-        for (Event e : client.events.get(demoProject.id)) {
+        for (Event e : client.events.get(demoProject.gid)) {
             System.out.println(e.action + ": " + e.type);
         }
     }

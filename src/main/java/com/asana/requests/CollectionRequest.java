@@ -5,11 +5,14 @@ import com.asana.iterator.CollectionPageIterator;
 import com.asana.models.ResultBodyCollection;
 import com.asana.resources.Resource;
 import com.google.api.client.http.HttpContent;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpResponse;
 import com.google.common.reflect.TypeParameter;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +46,15 @@ public class CollectionRequest<T> extends Request implements Iterable<T> {
      */
     public ResultBodyCollection<T> executeRaw() throws IOException {
         HttpResponse response = this.client.request(this);
+
+        if (this.client.logAsanaChangeWarnings) {
+            HttpHeaders reqHeaders = new HttpHeaders();
+            reqHeaders.putAll(this.client.headers);
+            handleAsanaChangeHeader(reqHeaders, response.getHeaders());
+        }
+
         return Json.getInstance().fromJson(
-                new InputStreamReader(response.getContent()),
+                new BufferedReader(new InputStreamReader(response.getContent(), StandardCharsets.UTF_8)),
                 new com.google.common.reflect.TypeToken<ResultBodyCollection<T>>() {
                 }.where(
                         new TypeParameter<T>() {
@@ -85,5 +95,9 @@ public class CollectionRequest<T> extends Request implements Iterable<T> {
 
     public CollectionRequest<T> option(String key, Object value) {
         return (CollectionRequest<T>) super.option(key, value);
+    }
+
+    public CollectionRequest<T> header(String key, String value) {
+        return (CollectionRequest<T>) super.header(key, value);
     }
 }

@@ -4,12 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Collection;
 
-public class Workspace {
-    public String id;
+public class Workspace extends Resource {
     public String name;
 
     @SerializedName("email_domains")
     public Collection<String> emailDomains;
+
     @SerializedName("is_organization")
     public boolean isOrganization;
 
@@ -19,7 +19,7 @@ public class Workspace {
 
     // constructor with id arg provided for convenience
     public Workspace(String id) {
-        this.id = id;
+        this.gid = id;
     }
 
 }

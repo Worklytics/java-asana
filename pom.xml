@@ -4,7 +4,7 @@
     <groupId>co.worklytics</groupId>
     <artifactId>asana</artifactId>
     <packaging>jar</packaging>
-    <version>0.5.3</version>
+    <version>0.10.2</version>
     <url>http://maven.apache.org</url>
     <name>java-asana</name>
     <description>A Java client for the Asana API.</description>
@@ -109,8 +109,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
 
@@ -228,6 +228,17 @@ final JAR file instead of the intermediate .class files. -->
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
