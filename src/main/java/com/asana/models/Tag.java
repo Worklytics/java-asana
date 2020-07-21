@@ -5,10 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collection;
 import com.google.api.client.util.DateTime;
 
-public class Tag {
-    public String id;
+public class Tag extends Resource {
     public String name;
-    public String notes;
 
     public String color;
     public Collection<User> followers;

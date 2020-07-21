@@ -4,12 +4,15 @@ import com.asana.Json;
 import com.asana.models.ResultBody;
 import com.asana.resources.Resource;
 import com.google.api.client.http.HttpContent;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpResponse;
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class ItemRequest<T> extends Request {
@@ -36,8 +39,15 @@ public class ItemRequest<T> extends Request {
      */
     public ResultBody<T> executeRaw() throws IOException {
         HttpResponse response = this.client.request(this);
+
+        if (this.client.logAsanaChangeWarnings) {
+            HttpHeaders reqHeaders = new HttpHeaders();
+            reqHeaders.putAll(this.client.headers);
+            handleAsanaChangeHeader(reqHeaders, response.getHeaders());
+        }
+
         return Json.getInstance().fromJson(
-                new InputStreamReader(response.getContent()),
+                new BufferedReader(new InputStreamReader(response.getContent(), StandardCharsets.UTF_8)),
                 new TypeToken<ResultBody<T>>() {
                 }.where(
                         new TypeParameter<T>() {
@@ -69,6 +79,10 @@ public class ItemRequest<T> extends Request {
 
     public ItemRequest<T> option(String key, Object value) {
         return (ItemRequest<T>) super.option(key, value);
+    }
+
+    public ItemRequest<T> header(String key, String value) {
+        return (ItemRequest<T>) super.header(key, value);
     }
 
 }

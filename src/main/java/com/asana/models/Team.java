@@ -1,8 +1,14 @@
 package com.asana.models;
 
-public class Team {
-    public String id;
+import com.google.gson.annotations.SerializedName;
+
+public class Team extends Resource {
     public String name;
+
+    public String description;
+
+    @SerializedName("html_description")
+    public String htmlDescription;
 
     public Workspace organization;
 }

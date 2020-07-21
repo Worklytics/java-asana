@@ -5,47 +5,76 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Collection;
 
-public class Task {
+public class Task extends ResourceWithSubtype {
     public static class Membership {
         public Project project;
         public Task section;
     }
 
-    public static class Heart {
-        public String id;
-        public User user;
-    }
+    public User assignee;
 
-    public String id;
-    public String name;
-    public String notes;
+    @SerializedName("assignee_status")
+    public String assigneeStatus;
+
+    @SerializedName("created_at")
+    public DateTime createdAt;
+
+    public boolean completed;
 
     @SerializedName("completed_at")
     public DateTime completedAt;
-    @SerializedName("due_at")
-    public DateTime dueAt;
+
+    @SerializedName("custom_fields")
+    public Collection<CustomField> customFields;
+
+    public Collection<Task> dependencies;
+    public Collection<Task> dependents;
+
     @SerializedName("due_on")
     public DateTime dueOn;
+    @SerializedName("due_at")
+    public DateTime dueAt;
 
-    public User assignee;
-    @SerializedName("assignee_status")
-    public String assigneeStatus;
-    public boolean completed;
+    public External external;
+
+    public Collection<User> followers;
+
+    @SerializedName("is_rendered_as_separator")
+    public boolean isRenderedAsSeparator;
+
+    public boolean liked;
+    public Collection<Like> likes;
+
+    public Collection<Membership> memberships;
+
+    @SerializedName("modified_at")
+    public DateTime modifiedAt;
+
+    public String name;
+
+    public String notes;
+    @SerializedName("html_notes")
+    public String htmlNotes;
+
+    @SerializedName("num_likes")
+    public int numLikes;
+
+    @SerializedName("num_subtasks")
+    public int numSubtasks;
+
+    public Task parent;
+
+    public Collection<Project> projects;
+
+    @SerializedName("start_on")
+    public DateTime startOn;
+
+    public Workspace workspace;
+
+    public Collection<Tag> tags;
 
     public boolean hearted;
     public Collection<Heart> hearts;
     @SerializedName("num_hearts")
     public int numHearts;
-
-    public Task parent;
-    public Collection<User> followers;
-    public Collection<Membership> memberships;
-    public Collection<Project> projects;
-    public Collection<Tag> tags;
-    public Workspace workspace;
-
-    @SerializedName("created_at")
-    public DateTime createdAt;
-    @SerializedName("modified_at")
-    public DateTime modifiedAt;
 }

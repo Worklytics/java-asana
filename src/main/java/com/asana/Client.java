@@ -43,22 +43,32 @@ public class Client {
         put("max_retries", 5);
     }};
 
-    public HashMap<String, Object> options;
+    public Map<String, Object> options;
+    public Map<String, String> headers;
 
     public Dispatcher dispatcher;
 
     public Attachments attachments;
-    public CustomFields custom_fields;
-    public CustomFieldSettings custom_field_settings;
+    public CustomFields customFields;
+    public CustomFieldSettings customFieldSettings;
     public Events events;
+    public Jobs jobs;
+    public OrganizationExports organizationExports;
+    public Portfolios portfolios;
+    public PortfolioMemberships portfolioMemberships;
     public Projects projects;
+    public ProjectStatuses projectStatuses;
+    public ProjectMemberships projectMemberships;
     public Stories stories;
     public Tags tags;
     public Tasks tasks;
     public Teams teams;
     public Users users;
+    public UserTaskLists userTaskLists;
     public Webhooks webhooks;
     public Workspaces workspaces;
+
+    public boolean logAsanaChangeWarnings;
 
     private static final String[] QUERY_OPTIONS = new String[]{"limit", "offset", "sync"};
     private static final String[] API_OPTIONS = new String[]{"pretty", "fields", "expand"};
@@ -70,7 +80,7 @@ public class Client {
      * @param dispatcher Dispatcher to handle authentication
      */
     public Client(Dispatcher dispatcher) {
-        this(dispatcher, null);
+        this(dispatcher, null, null);
     }
 
     /**
@@ -78,6 +88,15 @@ public class Client {
      * @param options    Map of client options, overrides Client.DEFAULTS, overridden by request options
      */
     public Client(Dispatcher dispatcher, Map<String, Object> options) {
+        this(dispatcher, null, null);
+    }
+
+    /**
+     * @param dispatcher Dispatcher to handle authentication
+     * @param options    Map of client options, overrides Client.DEFAULTS, overridden by request options
+     * @param headers    Map of default headers to use for requests, overridden by request headers
+     */
+    public Client(Dispatcher dispatcher, Map<String, Object> options, Map<String, String> headers) {
         this.dispatcher = dispatcher;
 
         this.options = new HashMap<String, Object>();
@@ -86,24 +105,38 @@ public class Client {
             this.options.putAll(options);
         }
 
+        this.headers = new HashMap<String, String>();
+        if (headers != null) {
+            this.headers.putAll(headers);
+        }
+
         this.attachments = new Attachments(this);
-        this.custom_fields = new CustomFields(this);
-        this.custom_field_settings = new CustomFieldSettings(this);
+        this.customFields = new CustomFields(this);
+        this.customFieldSettings = new CustomFieldSettings(this);
         this.events = new Events(this);
+        this.jobs = new Jobs(this);
+        this.organizationExports = new OrganizationExports(this);
+        this.portfolios = new Portfolios(this);
+        this.portfolioMemberships = new PortfolioMemberships(this);
         this.projects = new Projects(this);
+        this.projectStatuses = new ProjectStatuses(this);
+        this.projectMemberships = new ProjectMemberships(this);
         this.stories = new Stories(this);
         this.tags = new Tags(this);
         this.tasks = new Tasks(this);
         this.teams = new Teams(this);
         this.users = new Users(this);
+        this.userTaskLists = new UserTaskLists(this);
         this.webhooks = new Webhooks(this);
         this.workspaces = new Workspaces(this);
+
+        this.logAsanaChangeWarnings = true;
     }
 
     /**
      * @param request Asana client request object
      * @return Raw HttpResponse object
-     * @throws IOException
+     * @throws IOException if the request fails
      */
     public HttpResponse request(Request request) throws IOException {
         GenericUrl url = new GenericUrl(request.options.get("base_url") + request.path);
@@ -147,6 +180,10 @@ public class Client {
             url.put(entry.getKey(), value);
         }
 
+        // Headers
+        Map <String, String> headers = new HashMap<String, String>(this.headers);
+        headers.putAll(request.headers);
+
         if (request.content != null) {
             // Multipart, etc body
             content = request.content;
@@ -162,8 +199,8 @@ public class Client {
         while (true) {
             try {
                 HttpRequest httpRequest = this.dispatcher.buildRequest(request.method, url, content);
-
                 httpRequest.getHeaders().set(CLIENT_VERSION_HEADER_NAME, versionHeader());
+                httpRequest.getHeaders().putAll(headers);
 
                 try {
                     return httpRequest.execute();
@@ -223,7 +260,10 @@ public class Client {
     }
 
     /**
+     * WARNING: API Keys are deprecated and have been removed from Asana's API.
+     * Prefer using {@link #accessToken(String) accessToken method}.
      * @param apiKey Basic Auth API key
+     * @deprecated
      * @return Client instance
      */
     public static Client basicAuth(String apiKey) {
@@ -231,8 +271,11 @@ public class Client {
     }
 
     /**
+     * WARNING: API Keys are deprecated and have been removed from Asana's API.
+     * Prefer using {@link #accessToken(String, HttpTransport) accessToken method}.
      * @param apiKey        Basic Auth API key
      * @param httpTransport HttpTransport implementation to use for requests
+     * @deprecated
      * @return Client instance
      */
     public static Client basicAuth(String apiKey, HttpTransport httpTransport) {

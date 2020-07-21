@@ -47,4 +47,14 @@ public class ErrorsTest extends AsanaTest
 
         client.users.me().execute();
     }
+
+    @Test(expected = PremiumOnlyError.class)
+    public void testPremiumOnlyError402() throws IOException
+    {
+        // Handles actual 402 errors
+        dispatcher.registerResponse("GET", "http://app/users/me").code(402).content(
+              "{ \"errors\": [ { \"message\": \"Custom Fields are not available for free users or guests.\" } ] }");
+
+        client.users.me().execute();
+    }
 }

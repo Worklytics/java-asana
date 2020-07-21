@@ -10,7 +10,7 @@ If you use [Maven](http://maven.apache.org/) to manage dependencies you can incl
     <dependency>
          <groupId>com.asana</groupId>
          <artifactId>asana</artifactId>
-         <version>0.5.0</version>
+         <version>0.10.2</version>
     </dependency>
 
 Or, you can build the artifact and install it to your local Maven repository:
@@ -76,8 +76,8 @@ Asana supports OAuth 2. `java-asana` handles some of the details of the OAuth fl
 Create a client using your OAuth Client ID and secret:
 
     OAuthApp app = new OAuthApp(
-        "ASANA_CLIENT_ID"
-        "ASANA_CLIENT_SECRET"
+        "ASANA_CLIENT_ID",
+        "ASANA_CLIENT_SECRET",
         "urn:ietf:wg:oauth:2.0:oob"
     );
     Client client = Client.oauth(app);
@@ -105,20 +105,20 @@ Note: if you're writing a non-browser-based application (e.x. a command line too
 Usage
 -----
 
-The client's methods are divided into several resources: `attachments`, `events`, `projects`, `stories`, `tags`, `tasks`, `teams`, `users`, and `workspaces`.
+The client's methods are divided into several resources: `attachments`, `customFields`, `customFieldSettings`, `events`, `jobs`, `organizationExports`, `portfolios`, `portfolioMemberships`, `projects`, `projectMemberships`, `projectStatuses`, `stories`, `tags`, `tasks`, `teams`, `users`, `userTaskLists`, `webhooks`, and `workspaces`.
 
 Request methods use the "builder" pattern to set query string or JSON body parameters, and various request options, so a request must be initated using the `execute` or `executeRaw` methods:
 
 Methods that return a single object return that object directly:
 
     User me = client.users.me().execute();
-    System.out.println("Hello " + name.name);
+    System.out.println("Hello " + me.name);
 
-    String workspaceId = me.workspaces.get(0).id;
+    String workspaceId = me.workspaces.get(0).gid;
     Project project = client.projects.createInWorkspace(workspaceId)
         .data("name", "new project")
         .execute();
-    System.out.println("Created project with id: " + project.id);
+    System.out.println("Created project with id: " + project.gid);
 
 Methods that return multiple items (e.x. `findAll`) return an `Iterable` object. See the "Collections" section
 
@@ -153,6 +153,32 @@ Events:
 
 * `poll_interval` (default: 5): polling interval for getting new events via an `EventsRequest` iterator (e.x. `for (Event event : client.events.get(resourceId)) { ... }`)
 * `sync`: sync token returned by previous calls to `events.get` (e.x. `client.events.get(resourceId, syncToken).executeRaw().sync`)
+
+Headers
+-------
+
+To add global headers (like for our [deprecation framework](https://asana.com/developers/documentation/getting-started/deprecations)), you simply add them to the client.
+
+    client.headers.put("asana-enable", "string_ids");
+    
+### Asana Change Warnings
+
+You will receive warning logs if performing requests that may be affected by a deprecation. The warning contains a link that explains the deprecation.
+
+If you receive one of these warnings, you should:
+* Read about the deprecation.
+* Resolve sections of your code that would be affected by the deprecation.
+* Add the deprecation flag to your "asana-enable" header.
+
+You can place it on the client for all requests.
+
+    client.headers.put("asana-enable", "string_ids,new_sections");
+    or
+    client.headers.put("asana-disable", "string_ids");
+
+If you would rather suppress these warnings, you can set
+
+    client.logAsanaChangeWarnings = false;
 
 Collections
 -----------
@@ -197,7 +223,7 @@ Before you do this, you must set a few environment variables to authenticate:
 * Maven credentials: `MAVEN_USERNAME` and `MAVEN_PASSWORD`
 * GPG keyname and password: `MAVEN_GPG_KEYNAME` and `MAVEN_GPG_PASSWORD`
 
-You then can [log in](https://oss.sonatype.org/) to close and deploy the release.
+You can [log in](https://oss.sonatype.org/) to verify the new version landed, and after some time it will be deployed to maven.
 
 [travis-url]: http://travis-ci.org/Asana/java-asana
 [travis-image]: http://img.shields.io/travis/Asana/java-asana.svg?style=flat-square

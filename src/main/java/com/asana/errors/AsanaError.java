@@ -30,6 +30,8 @@ public class AsanaError extends IOException {
                 return new NoAuthorizationError(exception);
             case NotFoundError.STATUS:
                 return new NotFoundError(exception);
+            case PremiumOnlyError.STATUS:
+                return new PremiumOnlyError(exception);
             case RateLimitEnforcedError.STATUS:
                 return new RateLimitEnforcedError(exception);
             case ServerError.STATUS:
