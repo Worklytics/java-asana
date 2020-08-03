@@ -1,3 +1,30 @@
+# Worklytics Build
+
+## Workflow
+
+Maintain `master` in sync with main repo.  
+Use `worklytics-private` branch with whatever Worklytics-only changes we want.
+
+To develop:
+  - branch from `worklytics-private` (Eg, `{{sprint}}-feature-branch`); make local changes
+  - create PR against `worklytics-private`; after peer review and CI passes, merge to `worklytics-private`
+  - if want to get changes back to main project repo:
+    - branch from `master`
+    - cherry-pick commits from `feature-branch`to 
+  - if want to get changes from main project repo:
+    - update `master` branch from main project
+    - branch from `worklytics-private`
+    - merge `master` to that feature branch
+    - follow regular dev process
+
+To release for Worklytics:
+  - update version number in `worklytics-private` branch, using pattern `{{main-java-asana-version}}-worklytics
+  .{{private-version}}`
+  - tag with that version number
+  - use `./tools/publish-private-dep` tool in main Worklytics repo to publish 
+  
+
+---------
 # Asana [![Build Status][travis-image]][travis-url] [![Maven Version][mvn-image]][mvn-url]
 
 Java client library for the Asana API.
