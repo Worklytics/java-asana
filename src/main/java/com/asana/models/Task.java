@@ -13,6 +13,9 @@ public class Task extends ResourceWithSubtype {
 
     public User assignee;
 
+    @SerializedName("approval_status")
+    String approvalStatus;
+
     @SerializedName("assignee_status")
     public String assigneeStatus;
 
@@ -23,6 +26,9 @@ public class Task extends ResourceWithSubtype {
 
     @SerializedName("completed_at")
     public DateTime completedAt;
+
+    @SerializedName("completed_by")
+    public User completedBy;
 
     @SerializedName("custom_fields")
     public Collection<CustomField> customFields;
