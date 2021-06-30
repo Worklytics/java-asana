@@ -3,7 +3,7 @@ package com.asana.errors;
 import com.asana.Json;
 import com.asana.models.ErrorBody;
 import com.google.api.client.http.HttpResponseException;
-import com.google.api.client.repackaged.com.google.common.base.Joiner;
+import com.google.common.base.Joiner;
 
 import java.io.IOException;
 
